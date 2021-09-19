@@ -1,0 +1,34 @@
+#パッケージの読み込みはimport
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+#データの読み込みはpandasのread_csv()
+data_train=pd.read_csv("../input/titanic/train.csv")
+data_test=pd.read_csv("../input/titanic/test.csv")
+data_gender_submission=pd.read_csv("../input/titanic/gender_submission.csv")
+
+#データの概要を確認するにはcpandas_profilingが便利
+import pandas_profiling
+#実行はpandas.Dataflameのprofile_report()
+data_train.profile_report()
+
+#Pclassとsurvivedの件数を棒グラフで可視化
+sns.countplot(x="Pclass",hue="Survived",data=data_train)
+
+#教師データとテストデータ、双方にエンジニアリングを行うため、一旦結合
+data_all=pd.concat([data_train,data_test],sort=False)
+data_all
+
+#欠損値の数を確認
+data_all.isnull().sum()
+
+#sexの値を数値に置換
+data_all["Sex"].replace(["male","female"],[0,1],inplace=True)
+data_all.head()
+
+#embarkedの欠損を補完、数値に置換
+data_all["Embarked"].fillna("S",inplace=True)
+data_all["Embarked"].replace(["S","C","Q"],[0,1,2],inplace=True)
+data_all.head(900)
