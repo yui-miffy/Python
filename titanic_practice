@@ -32,3 +32,35 @@ data_all.head()
 data_all["Embarked"].fillna("S",inplace=True)
 data_all["Embarked"].replace(["S","C","Q"],[0,1,2],inplace=True)
 data_all.head(900)
+
+#Fareの欠損値を平均値で補完
+data_all["Fare"].fillna(np.mean(data_all["Fare"]),inplace=True)
+#ageの欠損値を平均値で補完
+data_all["Age"].fillna(np.mean(data_all["Age"]),inplace=True)
+#影響の少なそうな特徴量は一旦削除
+drop_columns=["PassengerId","Name","Parch","SibSp","Ticket","Cabin"]
+data_all.drop(drop_columns,axis=1,inplace=True)
+#欠損値がないことを再確認
+data_all.isnull().sum()
+
+#結合したデータを再度教師データとテストデータに分離
+data_train=data_all[:len(data_train)]
+data_test=data_all[len(data_train):]
+
+#アルゴリズムに投入するため特徴量と目的変数を分解
+y_data_train=data_train["Survived"]
+x_data_train=data_train.drop("Survived",axis=1)
+x_data_test=data_test.drop("Survived",axis=1)
+
+#ランダムフォレストアルゴリズムをインポート
+from sklearn.ensemble import RandomForestClassifier
+clf = RandomForestClassifier(n_estimators=100,max_depth=2,random_state=0)
+
+#教師データの学習
+clf.fit(x_data_train,y_data_train)
+
+#作成したモデルで予測
+#predictの閾値は0.5がデフォルト。0.5以上を１、0.5未満を0として返す
+y_data_pred=clf.predict(x_data_test)
+
+y_data_pred
